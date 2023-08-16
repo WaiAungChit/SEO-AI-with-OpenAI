@@ -1,45 +1,53 @@
-'''from google.ads.googleads.client import GoogleAdsClient
-from google.ads.googleads.errors import GoogleAdsException
+from pytrends.request import TrendReq
+from google.ads.googleads.client import GoogleAdsClient
+import models.model  
 
+customer_id = "2818815694"
+def generate_keyword_ideas(data: models.model.WebsiteCategory, page_url, customer_id = "2818815694"):
+    pytrends = TrendReq(hl='en-US', tz=420)
+    
+    # Build payload for Google Trends
+    pytrends.build_payload([models.model.WebsiteCategory], cat=0, timeframe='now 1-d', geo='TH', gprop='')
+    trend = pytrends.related_topics()
 
-client = GoogleAdsClient.load_from_storage("google-ads.yaml")
+    top_related_topics = []
+    if models.model.WebsiteCategory in trend:
+        related_topics = trend[models.model.WebsiteCategory]['top']
+        if not related_topics.empty:
+            top_related_topics = list(related_topics['topic_title'][:5])
+        else:
+            print(f"No top related topics available for '{models.model.WebsiteCategory}' in Thailand.")
+    else:
+        print(f"No related topics available for '{models.model.WebsiteCategory}' in Thailand.")
 
+    print("Top 5 related topics:")
+    print(top_related_topics)
 
-def get_trending_keywords(website_category):
-    # Create a query to get trending keywords for today
-    query = (
-        "SELECT keyword.text, keyword.search_volume "
-        "FROM keyword "
-        "JOIN keyword_category ON keyword.id = keyword_category.keyword "
-        "JOIN category ON keyword_category.category = category.id "
-        "WHERE category.name = @website_category "
-        "AND keyword.search_volume >= 1000 "
-        "AND keyword.date_range.start_date = CURRENT_DATE "
-        "ORDER BY keyword.search_volume ASC "
-        "LIMIT 10"
-    )
+    client = GoogleAdsClient.load_from_storage("google-ads.yaml")
 
-    # Execute the query and retrieve trending keywords
-    response = client.service.google_ads.search(query=query, website_category=website_category)
-    keywords = [row["keyword"]["text"]["value"] for row in response]
-    return keywords
-
-
-# Get Semantic keywords using Google Ads API
-def get_semantic_keywords(website_category):
-    # Create a query to get semantic keywords
-    query = (
-        "SELECT keyword.text "
-        "FROM keyword "
-        "JOIN keyword_category ON keyword.id = keyword_category.keyword "
-        "JOIN category ON keyword_category.category = category.id "
-        "WHERE category.name = @website_category "
-        "ORDER BY keyword.text ASC "  # Order by keyword text in ascending order
-        "LIMIT 10"
-    )
-
-    # Execute the query and retrieve semantic keywords
-    response = client.service.google_ads.search(query=query, website_category=website_category)
-    keywords = [row["keyword"]["text"]["value"] for row in response]
-    return keywords
-'''
+    keyword_ideas = []
+    
+    if not (top_related_topics or page_url):
+        raise ValueError(
+            "At least one of keywords or page URL is required, "
+            "but neither was specified."
+        )
+    
+    keyword_plan_idea_service = client.get_service("KeywordPlanIdeaService")
+    keyword_competition_level_enum = client.enums.KeywordPlanCompetitionLevelEnum
+    keyword_plan_network = client.enums.KeywordPlanNetworkEnum.GOOGLE_SEARCH_AND_PARTNERS
+    
+    request = client.get_type("GenerateKeywordIdeasRequest")
+    request.customer_id = customer_id
+    request.keyword_plan_network = keyword_plan_network
+    
+    if not top_related_topics and page_url:
+        request.url_seed.url = page_url
+    
+    if top_related_topics and page_url:
+        request.keyword_and_url_seed.url = page_url
+        request.keyword_and_url_seed.keywords.extend(top_related_topics)
+    
+    keyword_ideas = keyword_plan_idea_service.generate_keyword_ideas(request=request)
+    keyword_list = [idea.text for idea in keyword_ideas]
+    return keyword_list
