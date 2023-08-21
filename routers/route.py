@@ -3,6 +3,14 @@ import models.model as category
 import services.openai_service as openai_services
 import services.google_ads_service as google_ads_services
 from utilities.utility import generate_blog_topic, generate_content, generate_meta_tags_description, generate_page_title
+import firebase_admin
+from firebase_admin import credentials, firestore
+
+
+# Initialize Firebase Admin SDK
+cred = credentials.Certificate('cred.json')
+firebase_admin.initialize_app(cred)
+db = firestore.client()
 
 # endpoint urls
 endpoints = {
@@ -17,7 +25,6 @@ router = APIRouter()
 # Generate data post route
 @router.post("/generate-data/{endpoint_path}/")
 async def generate_data(endpoint_path: str, data: category.WebsiteCategory):
-    print({"params": endpoint_path, "website_category": data.website_category})
     if endpoint_path not in endpoints:
         raise HTTPException(status_code=404, detail="Endpoint not found")
 
@@ -33,5 +40,14 @@ async def generate_data(endpoint_path: str, data: category.WebsiteCategory):
     
     # Generate content using the OpenAI API and the selected prompt function
     generated_data = openai_services.generate_data(prompt)
-    #
+
+    data={
+        "website_category": website_category,
+        "endpoint_path": endpoint_path,
+        "generated_data": generated_data,
+    }
+
+    collection_name = "website_data"
+    doc_ref = db.collection(collection_name).add(data)
+
     return {"generated_data": generated_data, "endpoint_path": endpoint_path}
