@@ -31,8 +31,7 @@ async def generate_data(endpoint_path: str, data: category.WebsiteCategory):
     website_category = data.website_category
 
     # Generate the list of keywords using the generate_keyword_ideas function
-    keyword_list = google_ads_services.generate_keyword_ideas(website_category,page_url=None)
-
+    keyword_list = google_ads_services.generate_keyword_ideas(website_category)
     # Get the corresponding prompt function from the endpoints dictionary
     prompt_func = endpoints[endpoint_path]
     prompt = prompt_func(keyword_list)

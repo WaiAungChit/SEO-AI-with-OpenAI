@@ -2,19 +2,18 @@ from pytrends.request import TrendReq
 from google.ads.googleads.client import GoogleAdsClient
 import models.model  
 
-customer_id = "2818815694"
-def generate_keyword_ideas(website_category, page_url, customer_id = "2818815694"):
+def generate_keyword_ideas(website_category):
     pytrends = TrendReq(hl='en-US', tz=420)
-    
+    print("Trend",pytrends)
     # Build payload for Google Trends
     pytrends.build_payload([website_category], cat=0, timeframe='now 1-d', geo='TH', gprop='')
     trend = pytrends.related_topics()
-    top_related_topics = []
     if website_category in trend:
         related_topics = trend[website_category]['top']
         top_related_topics = list(related_topics['topic_title'][:5])
+        return top_related_topics
 
-    client = GoogleAdsClient.load_from_storage("google-ads.yaml")
+''' client = GoogleAdsClient.load_from_storage("google-ads.yaml")
     keyword_ideas = []
     
     if not (top_related_topics or page_url):
@@ -39,4 +38,4 @@ def generate_keyword_ideas(website_category, page_url, customer_id = "2818815694
         request.keyword_and_url_seed.keywords.extend(top_related_topics)
     keyword_ideas = keyword_plan_idea_service.generate_keyword_ideas(request=request)
     keyword_list = [idea.text for idea in keyword_ideas]
-    return keyword_list
+    return keyword_list'''
