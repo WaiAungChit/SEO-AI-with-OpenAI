@@ -29,6 +29,7 @@ google-resumable-media==2.5.0
 googleapis-common-protos==1.60.0
 grpcio==1.56.2
 grpcio-status==1.56.2
+gunicorn==21.2.0
 h11==0.14.0
 httplib2==0.22.0
 httptools==0.6.0
@@ -39,8 +40,8 @@ multidict==6.0.4
 numpy==1.25.2
 oauthlib==3.2.2
 openai==0.27.8
+packaging==23.1
 pandas==2.0.3
-pip==23.2.1
 proto-plus==1.22.3
 protobuf==4.23.4
 pyasn1==0.5.0
