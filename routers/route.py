@@ -29,6 +29,8 @@ async def generate_data(endpoint_path: str, data: category.WebsiteCategory):
         raise HTTPException(status_code=404, detail="Endpoint not found")
 
     website_category = data.website_category
+    website_url = data.website_url
+    content_type = data.content_type
 
     # Generate the list of keywords using the generate_keyword_ideas function
     keyword_list = google_ads_services.generate_keyword_ideas(website_category)
@@ -42,8 +44,10 @@ async def generate_data(endpoint_path: str, data: category.WebsiteCategory):
 
     data={
         "website_category": website_category,
+        "website_url": website_url,
         "endpoint_path": endpoint_path,
         "generated_data": generated_data,
+        "content_type": content_type
     }
 
     collection_name = "website_data"

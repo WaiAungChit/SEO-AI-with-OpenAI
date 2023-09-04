@@ -5,7 +5,7 @@ def generate_meta_tags_description(top_related_topics):
     ...
     Trending Keywords: {', '.join(top_related_topics)}
     ...
-    Use these keywords strategically to create a compelling and relevant meta tags description that encourages users to visit your website and boosts your search engine ranking.
+    Use these keywords strategically to create a compelling and relevant meta tags description for that encourages users to visit your website and boosts your search engine ranking.
     """
     return prompt
 
@@ -38,7 +38,7 @@ def generate_content(top_related_topics):
     ...
     Trending Keywords: {', '.join(top_related_topics)}
     ...
-    Write an article, blog post, or any content that discusses your topic comprehensively and engages your audience throughout the reading experience.
+    Write an article, blog post, or any content for that discusses your topic comprehensively and engages your audience throughout the reading experience.
     """
     return prompt
 
